@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "NewsArticle": {
+      "title": "News Article",
+      "description": "Represents a Bollywood or Hollywood news article.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string", "enum": ["Bollywood", "Hollywood", "Trending", "Reviews"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "imageUrl": { "type": "string" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "slug": { "type": "string" },
+        "viralScore": { "type": "number" },
+        "seoData": {
+          "type": "object",
+          "properties": {
+            "metaTitle": { "type": "string" },
+            "metaDescription": { "type": "string" },
+            "keywords": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      },
+      "required": ["title", "content", "category", "slug"]
+    },
+    "SystemStats": {
+      "title": "System Stats",
+      "description": "Global performance and monetization tracking.",
+      "type": "object",
+      "properties": {
+        "totalArticles": { "type": "number" },
+        "seoHealth": { "type": "number" },
+        "monthlyEst": { "type": "number" },
+        "lastRefreshed": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "articles": {
+      "schema": "NewsArticle",
+      "description": "Public news feed articles."
+    },
+    "stats": {
+      "schema": "SystemStats",
+      "description": "Global application telemetry."
+    }
+  }
+}
