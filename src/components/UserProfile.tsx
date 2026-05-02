@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { User, Bell, Shield, LogOut, Star, ChevronRight, Check, ShieldCheck } from "lucide-react";
+import { User, Bell, Shield, LogOut, Star, ChevronRight, Check } from "lucide-react";
 import { cn } from "@/src/lib/utils";
-import AdminPanel from "./AdminPanel";
 
 export default function UserProfile() {
   const [activeTab, setActiveTab] = useState("account");
@@ -11,7 +10,6 @@ export default function UserProfile() {
     { id: "account", label: "Account Information", icon: User },
     { id: "preferences", label: "News Preferences", icon: Star },
     { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "admin", label: "Admin Console", icon: ShieldCheck },
     { id: "privacy", label: "Privacy & Security", icon: Shield },
   ];
 
@@ -102,10 +100,6 @@ export default function UserProfile() {
                    </div>
                  </div>
                </motion.div>
-             )}
-
-             {activeTab === "admin" && (
-               <AdminPanel onRefresh={() => console.log("Refresh")} />
              )}
 
              {activeTab === "notifications" && (

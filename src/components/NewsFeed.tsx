@@ -10,9 +10,10 @@ interface Props {
   onArticleClick: (article: NewsArticle) => void;
   favorites: string[];
   onFavoriteToggle: (id: string, e: React.MouseEvent) => void;
+  systemHealth?: any;
 }
 
-export default function NewsFeed({ news, loading, onArticleClick, favorites, onFavoriteToggle }: Props) {
+export default function NewsFeed({ news, loading, onArticleClick, favorites, onFavoriteToggle, systemHealth }: Props) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -25,19 +26,65 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
 
   if (news.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-        <MessageSquare size={48} className="mb-4 opacity-20" />
-        <p className="text-xl font-medium">No results found for your search.</p>
-        <p className="text-sm">Try different keywords or filters.</p>
+      <div className="flex flex-col items-center justify-center py-20 text-slate-500 text-center">
+        <div className="bg-purple-500/10 border border-purple-500/20 p-12 rounded-[3rem] max-w-xl shadow-2xl backdrop-blur-xl">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="w-20 h-20 bg-gradient-to-tr from-purple-600 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-purple-500/20"
+          >
+            <Clock size={40} className="text-white" />
+          </motion.div>
+          
+          <h3 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter italic">Initializing Autonomous Feed...</h3>
+          <p className="text-sm text-slate-400 mb-8 max-w-md mx-auto leading-relaxed uppercase tracking-widest font-bold opacity-60">
+            The AI Scraping Engine is scanning RSS nodes across the global entertainment network. 
+            Fresh intelligence will materialize shortly.
+          </p>
+          
+          <div className="flex flex-col gap-4">
+             <button 
+              onClick={() => window.location.reload()}
+              className="px-8 py-4 bg-white text-black font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl hover:bg-purple-500 hover:text-white transition-all duration-500 active:scale-95 shadow-xl"
+            >
+              Force Node Re-Scan
+            </button>
+            <p className="text-[10px] text-slate-600 uppercase font-black tracking-widest">
+              Automated • No-Cost • Decentralized
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   const featured = news[0];
   const list = news.slice(1);
+  const breaking = news.slice(0, 5);
 
   return (
     <div className="space-y-8">
+      {/* Breaking Ticker */}
+      <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[1.5rem] py-3 px-6 flex items-center gap-4 overflow-hidden shadow-2xl relative">
+        <div className="flex items-center gap-2 text-orange-500 font-black text-[10px] uppercase tracking-widest shrink-0">
+          <Flame size={14} className="animate-pulse" /> Breaking Now
+        </div>
+        <div className="h-4 w-px bg-white/10 shrink-0" />
+        <div className="flex-1 overflow-hidden">
+          <motion.div 
+            animate={{ x: [0, -1000] }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="flex gap-12 whitespace-nowrap"
+          >
+            {breaking.map(b => (
+              <span key={b.id} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer hover:text-white transition-colors" onClick={() => onArticleClick(b)}>
+                <span className="text-white">●</span> {b.title}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
       {/* Featured Article */}
       {featured && (
         <motion.div

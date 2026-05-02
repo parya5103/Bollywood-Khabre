@@ -26,14 +26,14 @@ import type { NewsArticle, UserPreferences } from "@/src/types";
 import NewsFeed from "./components/NewsFeed";
 import UserProfile from "./components/UserProfile";
 import ArticleView from "./components/ArticleView";
-import AdminPanel from "./components/AdminPanel";
 
-type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending" | "reviews" | "admin";
+type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending" | "reviews";
 
 export default function App() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("home");
+  const [systemHealth, setSystemHealth] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -44,7 +44,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (view !== "profile" && view !== "admin") {
+    if (view !== "profile") {
       fetchNews();
     }
   }, [view, searchQuery]);
@@ -52,6 +52,20 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
+
+  useEffect(() => {
+    checkHealth();
+  }, []);
+
+  const checkHealth = async () => {
+    try {
+      const res = await fetch("/api/health");
+      const data = await res.json();
+      setSystemHealth(data);
+    } catch (e) {
+      setSystemHealth({ status: "offline", firebase: "unknown" });
+    }
+  };
 
   const fetchNews = async () => {
     setLoading(true);
@@ -118,20 +132,21 @@ export default function App() {
             </div>
             {isSidebarOpen && (
               <h1 className="text-xl font-bold tracking-tight text-white">
-                CinePulse <span className="text-orange-400">AI</span>
+                CinePulse <span className="text-orange-400">Wire</span>
               </h1>
             )}
           </div>
 
           <nav className="flex-1 space-y-2">
-            <NavItem id="nav-home" icon={Home} label="Discovery" active={view === "home"} onClick={() => setView("home")} />
-            <NavItem id="nav-trending" icon={Flame} label="Viral Now" active={view === "trending"} onClick={() => setView("trending")} />
+            <NavItem id="nav-home" icon={Home} label="Live Wire" active={view === "home"} onClick={() => setView("home")} />
+            <NavItem id="nav-trending" icon={Flame} label="Viral Pulse" active={view === "trending"} onClick={() => setView("trending")} />
             <NavItem id="nav-bollywood" icon={Clapperboard} label="Bollywood" active={view === "bollywood"} onClick={() => setView("bollywood")} />
             <NavItem id="nav-hollywood" icon={TrendingUp} label="Hollywood" active={view === "hollywood"} onClick={() => setView("hollywood")} />
             <NavItem id="nav-reviews" icon={Filter} label="Top Reviews" active={view === "reviews"} onClick={() => setView("reviews")} />
             <div className="h-px bg-white/10 my-4" />
-            <NavItem id="nav-saved" icon={Bookmark} label="Favorite Stories" active={view === "saved"} onClick={() => setView("saved")} />
+            <NavItem id="nav-saved" icon={Bookmark} label="Pinned Stories" active={view === "saved"} onClick={() => setView("saved")} />
           </nav>
+
 
           <div className="mt-auto space-y-2">
             <NavItem id="nav-profile" icon={User} label="Profile" active={view === "profile"} onClick={() => setView("profile")} />
@@ -151,6 +166,24 @@ export default function App() {
         "transition-all duration-300 min-h-screen relative z-10 flex flex-col",
         isSidebarOpen ? "pl-64" : "pl-0 md:pl-20"
       )}>
+        {/* Breaking News Marquee */}
+        <div className="bg-red-600/10 border-b border-red-600/20 py-2 overflow-hidden whitespace-nowrap relative">
+          <div className="absolute left-0 top-0 bottom-0 px-4 bg-red-600 text-white text-[10px] font-black uppercase flex items-center z-10 shadow-lg">
+            Viral Now
+          </div>
+          <motion.div 
+            animate={{ x: ["100%", "-100%"] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="inline-flex gap-12 pl-24"
+          >
+            {Array.isArray(news) && news.slice(0, 5).map((n, i) => (
+              <span key={i} className="text-[10px] font-bold text-red-500 uppercase tracking-widest flex items-center gap-2">
+                <Flame size={12} fill="currentColor" /> {n.title}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
         {/* Header */}
         <header className="sticky top-4 z-40 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mx-6 my-4 shadow-2xl">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
@@ -192,11 +225,12 @@ export default function App() {
                 <UserProfile />
               ) : (
                 <NewsFeed 
-                  news={view === "saved" ? news.filter(n => favorites.includes(n.id)) : news} 
+                  news={view === "saved" ? (Array.isArray(news) ? news.filter(n => favorites.includes(n.id)) : []) : (Array.isArray(news) ? news : [])} 
                   loading={loading}
                   onArticleClick={(article) => setSelectedArticle(article)}
                   favorites={favorites}
                   onFavoriteToggle={toggleFavorite}
+                  systemHealth={systemHealth}
                 />
               )}
             </motion.div>

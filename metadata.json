@@ -1,6 +1,6 @@
 {
-  "name": "CinePulse",
-  "description": "Fully automated AI-powered news platform for Bollywood & Hollywood. Features real-time RSS scraping, Gemini-driven article rewriting, SEO optimization, and auto-monetized dashboards.",
+  "name": "CinePulse AI Engine",
+  "description": "Autonomous entertainment news ecosystem powered by Gemini. Real-time scraping, bilingual rewriting (English/Hindi), and SEO-first publishing for the global cinematic market.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Bookmark, Share2, Sparkles, Clock, User, Facebook, Twitter, Link2, Flame } from "lucide-react";
+import { X, Bookmark, Share2, Sparkles, Clock, User, Facebook, Twitter, Link2, Flame, Languages, LineChart, ShoppingCart, Info } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { cn, formatDate } from "@/src/lib/utils";
 import type { NewsArticle } from "@/src/types";
+import Newsletter from "./Newsletter";
 
 interface Props {
   article: NewsArticle;
@@ -14,25 +15,41 @@ interface Props {
   onToggleSave: (e: React.MouseEvent) => void;
 }
 
+const AdPlaceholder = ({ className, label = "Advertisement" }: { className?: string; label?: string }) => (
+  <div className={cn("bg-slate-900/50 border border-white/5 rounded-2xl flex flex-col items-center justify-center p-4", className)}>
+    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-2">{label}</span>
+    <div className="w-12 h-1 bg-white/5 rounded-full mb-4" />
+    <p className="text-[9px] text-slate-500 uppercase font-bold tracking-widest text-center px-4">Monetization Ready Zone • AdSense Auto-Fill</p>
+  </div>
+);
+
 export default function ArticleView({ article, isOpen, onClose, isSaved, onToggleSave }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
+
+  useEffect(() => {
+    if (article.seoData?.schema) {
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.text = JSON.stringify(article.seoData.schema);
+      document.head.appendChild(script);
+      return () => {
+        const existing = document.head.querySelector('script[type="application/ld+json"]');
+        if (existing) document.head.removeChild(existing);
+      };
+    }
+  }, [article]);
 
   const summarize = async () => {
     if (summary) return;
     setIsSummarizing(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Please summarize this news article in 3-4 bullet points. Focus on key details:
-          Title: ${article.title}
-          Content: ${article.content}`,
-      });
-      setSummary(response.text || "Failed to generate summary.");
+      const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(`Summarize this in 3 punchy bullets: ${article.title}. ${article.description}`);
+      setSummary(result.response.text());
     } catch (error) {
-      console.error("Summarization failed:", error);
-      setSummary("Error generating summary. Please try again later.");
+      setSummary("AI synthesis unavailable. Please read full story.");
     } finally {
       setIsSummarizing(false);
     }
@@ -40,159 +57,95 @@ export default function ArticleView({ article, isOpen, onClose, isSaved, onToggl
 
   const share = (platform: string) => {
     const url = window.location.href;
-    const text = `Check out this news: ${article.title}`;
-    
-    switch(platform) {
-      case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
-        break;
-      case 'facebook':
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
-        break;
-      case 'copy':
-        navigator.clipboard.writeText(url);
-        alert("Link copied to clipboard!");
-        break;
+    const text = article.title;
+    if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
+    if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+    if (platform === 'copy') {
+      navigator.clipboard.writeText(url);
+      alert("Intelligence URL Copied");
     }
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-      />
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
       
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl max-h-[90vh] glass rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        initial={{ opacity: 0, y: 40, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 40, scale: 0.98 }}
+        className="relative w-full max-w-5xl max-h-[92vh] glass-dark border border-white/10 rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row"
       >
-        {/* Header Controls */}
-        <div className="absolute top-4 right-4 flex gap-2 z-10">
-          <button 
-            onClick={onToggleSave}
-            className={cn(
-              "p-2.5 rounded-full backdrop-blur-md border border-white/10 transition-all",
-              isSaved ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20" : "bg-black/40 text-white hover:bg-black/60"
-            )}
-          >
-            <Bookmark size={20} fill={isSaved ? "currentColor" : "none"} />
-          </button>
-          <button 
-            onClick={onClose}
-            className="p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-black/60 transition-all"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        <button onClick={onClose} className="absolute top-6 right-6 z-50 p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white transition-all"><X size={20} /></button>
 
-        <div className="overflow-y-auto flex-1 scrollbar-hide">
-          {/* Trending Progress Bar */}
-          <div className="absolute top-0 left-0 h-1 bg-gradient-to-r from-purple-500 to-orange-500 z-20 transition-all duration-1000" style={{ width: `${article.viralScore}%` }} />
-          
-          {/* Main Image */}
-          <div className="relative aspect-video">
-            <img 
-              src={article.imageUrl} 
-              alt={article.title}
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#05070A] via-transparent to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8">
-               <span className="px-3 py-1 bg-white/10 backdrop-blur-md text-orange-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-white/10 mb-3 inline-block">
-                {article.category}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2 leading-tight">
-                {article.title}
-              </h2>
-              <div className="flex items-center gap-4 text-slate-300 text-[10px] font-bold tracking-widest uppercase">
-                <span className="flex items-center gap-1.5"><User size={14} className="text-purple-400" /> {article.author}</span>
-                <span className="flex items-center gap-1.5"><Clock size={14} /> {formatDate(article.publishedAt)}</span>
-              </div>
+        <div className="md:w-1/2 relative bg-black overflow-hidden">
+          <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+          <div className="absolute bottom-10 left-10 right-10">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
+              <Flame size={12} /> {article.category}
+            </span>
+            <h2 className="text-4xl md:text-5xl font-black text-white leading-[1.1] tracking-tighter mb-6 italic uppercase">{article.title}</h2>
+            <div className="flex items-center gap-6 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+              <span className="flex items-center gap-2 text-purple-400"><User size={14} /> {article.author}</span>
+              <span className="flex items-center gap-2"><Clock size={14} /> {formatDate(article.publishedAt)}</span>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-8 md:p-12">
-            {article.viralScore > 80 && (
-              <div className="mb-8 p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl flex items-center gap-4">
-                <Flame size={24} className="text-orange-500" />
-                <div>
-                  <h4 className="text-xs font-black uppercase tracking-widest text-orange-400">Viral Alert</h4>
-                  <p className="text-xs text-orange-200">This story is trending with a viral score of {article.viralScore}/100.</p>
-                </div>
+        <div className="md:w-1/2 flex flex-col overflow-y-auto scrollbar-hide">
+          <div className="p-10 md:p-14 space-y-10">
+            <AdPlaceholder className="h-32 mb-8 bg-gradient-to-br from-purple-500/5 to-orange-500/5 border-dashed border-white/10" />
+
+            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/10">
+              <div className={cn("w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]", 
+                article.sentiment === "Positive" ? "bg-green-400" : article.sentiment === "Negative" ? "bg-red-400" : "bg-blue-400"
+              )} />
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Market Sentiment</p>
+                <p className="text-xs font-bold text-white uppercase">{article.sentiment} Insight</p>
               </div>
-            )}
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Main Text */}
-              <div className="flex-1 space-y-6">
-                <div className="prose prose-invert prose-amber max-w-none text-slate-300 leading-relaxed text-lg">
-                  {article.content}
-                </div>
-
-                {/* Share Section */}
-                <div className="pt-8 border-t border-white/5">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Share this story</p>
-                  <div className="flex gap-3">
-                    <button onClick={() => share('twitter')} className="p-3 glass rounded-xl hover:bg-white/10 transition-colors"><Twitter size={20} /></button>
-                    <button onClick={() => share('facebook')} className="p-3 glass rounded-xl hover:bg-white/10 transition-colors"><Facebook size={20} /></button>
-                    <button onClick={() => share('copy')} className="p-3 glass rounded-xl hover:bg-white/10 transition-colors"><Link2 size={20} /></button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sidebar - AI Tools */}
-              <div className="w-full md:w-72 space-y-6">
-                <div className="glass-dark rounded-2xl p-6">
-                  <div className="flex items-center gap-2 mb-4 text-purple-400">
-                    <Sparkles size={18} />
-                    <h4 className="font-bold text-sm uppercase tracking-widest">AI Summary</h4>
-                  </div>
-                  
-                  {summary ? (
-                    <div className="text-sm text-slate-300 leading-relaxed glass-dark p-4 rounded-xl border border-white/5">
-                      <ReactMarkdown>{summary}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={summarize}
-                      disabled={isSummarizing}
-                      className="w-full py-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 group shadow-lg shadow-purple-500/20"
-                    >
-                      {isSummarizing ? (
-                        "Synthesizing..."
-                      ) : (
-                        <>
-                          <Sparkles size={16} className="group-hover:animate-pulse" />
-                          Summarize News
-                        </>
-                      )}
-                    </button>
-                  )}
-                  
-                  <p className="text-[10px] text-slate-500 mt-4 text-center font-medium opacity-60">
-                    AI insights generated instantly.
-                  </p>
-                </div>
-
-                <div className="glass-dark rounded-2xl p-6">
-                   <h4 className="font-black text-xs mb-4 uppercase tracking-widest text-slate-400">Related Tags</h4>
-                   <div className="flex flex-wrap gap-2">
-                     {article.tags.map(tag => (
-                       <span key={tag} className="px-3 py-1 glass-dark rounded-lg text-[10px] font-bold text-slate-500 border border-white/5 uppercase tracking-widest hover:text-purple-400 transition-colors">
-                         #{tag}
-                       </span>
-                     ))}
-                   </div>
+              <div className="text-right">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Viral Pulse</p>
+                <div className="h-1.5 w-16 bg-white/10 rounded-full mt-1 overflow-hidden">
+                   <div className="h-full bg-orange-500" style={{ width: `${article.viralScore}%` }} />
                 </div>
               </div>
             </div>
+
+            <div className="prose prose-invert prose-white max-w-none">
+               <div className="text-slate-300 text-lg leading-relaxed font-medium space-y-6">
+                 <ReactMarkdown>{article.content}</ReactMarkdown>
+               </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-indigo-500/20 p-8 rounded-[2rem] space-y-6">
+              <div className="flex items-center justify-between">
+                <h4 className="flex items-center gap-3 text-white font-black uppercase text-xs tracking-widest italic">
+                  <ShoppingCart size={18} className="text-indigo-400" /> Curated Merch
+                </h4>
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Affiliate Integration</p>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed font-bold">
+                Gear up with limited edition <span className="text-indigo-400">"{article.title}"</span> collectibles.
+              </p>
+              <button className="w-full py-4 bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-indigo-500 hover:text-white transition-all shadow-xl">
+                Check Availability on Amazon
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-10 border-t border-white/5">
+               {article.tags.map(tag => (
+                 <span key={tag} className="px-4 py-2 bg-white/5 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest border border-white/5 hover:text-white hover:border-white/20 cursor-pointer">#{tag}</span>
+               ))}
+            </div>
+
+            <div className="pt-10 flex gap-4">
+               <button onClick={() => share('twitter')} className="flex-1 py-4 glass-dark rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all font-black uppercase text-[10px] tracking-widest"><Twitter size={18} /> Tweet</button>
+               <button onClick={() => share('copy')} className="flex-1 py-4 glass-dark rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all font-black uppercase text-[10px] tracking-widest"><Link2 size={18} /> Link</button>
+            </div>
+            
+            <AdPlaceholder className="h-60 mt-12" label="Bottom Sponsor Zone" />
           </div>
         </div>
       </motion.div>

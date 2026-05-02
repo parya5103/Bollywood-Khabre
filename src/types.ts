@@ -10,10 +10,13 @@ export interface NewsArticle {
   publishedAt: string;
   slug: string;
   viralScore: number;
+  sentiment: "Positive" | "Neutral" | "Negative";
+  language: "Bilingual" | "English" | "Hindi";
   seoData?: {
     metaTitle: string;
     metaDescription: string;
     keywords: string[];
+    schema?: any;
   };
 }
 
