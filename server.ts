@@ -7,17 +7,14 @@ import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 import { DateTime } from "luxon";
 import helmet from "helmet";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, limit, query, orderBy, doc, setDoc, where } from "firebase/firestore";
+import admin from "firebase-admin";
 import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Firebase Setup ---
-let db: any;
-let newsCollection: any;
-let statsDoc: any;
+// --- Firebase Admin Setup ---
+let adminDb: admin.firestore.Firestore;
 let fbError: string | null = null;
 
 function initFirebase() {
@@ -28,16 +25,15 @@ function initFirebase() {
     }
     
     const firebaseConfig = JSON.parse(fs.readFileSync(firebaseConfigPath, "utf8"));
-    const databaseId = firebaseConfig.firestoreDatabaseId;
     
-    console.log(`[FIREBASE] Connecting to: ${databaseId}`);
+    console.log(`[FIREBASE] Connecting to: ${firebaseConfig.projectId}`);
 
-    const app = initializeApp(firebaseConfig);
-    db = getFirestore(app, databaseId);
+    admin.initializeApp({
+      projectId: firebaseConfig.projectId
+    });
 
-    newsCollection = collection(db, "articles");
-    statsDoc = doc(db, "stats", "global");
-    console.log("[FIREBASE] Autonomous Connection Ready");
+    adminDb = admin.firestore(firebaseConfig.firestoreDatabaseId);
+    console.log("[FIREBASE] Autonomous Admin Connection Ready");
     fbError = null;
   } catch (err: any) {
     console.error("[FIREBASE] Initialization Error:", err.message);
@@ -73,7 +69,14 @@ interface NewsArticle {
 // In-memory store removed in favor of Firestore persistence.
 
 // --- AI Service (Server-side) ---
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_KEY) {
+  console.error("[AI-SERVICE] CRITICAL: GEMINI_API_KEY is missing from environment.");
+} else {
+  console.log(`[AI-SERVICE] API Key detected (prefix: ${GEMINI_KEY.substring(0, 4)}..., length: ${GEMINI_KEY.length})`);
+}
+
+const genAI = GEMINI_KEY ? new GoogleGenerativeAI(GEMINI_KEY) : null;
 
 const aiService = {
   getRawArticle(rawArticle: any): NewsArticle {
@@ -105,13 +108,13 @@ const aiService = {
     if (!genAI) return this.getRawArticle(rawArticle);
     
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const prompt = `
         Act as a professional SEO journalist. Rewrite this news for CinePulse.ai.
         REQUIREMENTS:
         1. Professional English tone.
         2. Format: Headline, 2-3 detailed paragraphs.
-        3. Add a section: "हिंदी सारांश" (Hindi Summary) with a 2-sentence gist.
+        3. Provide a separate "hindi_summary" with a 2-sentence gist.
         4. Sentiment: Positive/Neutral/Negative.
         5. Keywords: 5 relevant entertainment keywords.
         
@@ -119,7 +122,8 @@ const aiService = {
         {
           "headline": "SEO Catchy Title",
           "summary": "160 char summary",
-          "full_article": "Markdown formatted news including Hindi summary",
+          "full_article": "Markdown formatted news",
+          "hindi_summary": "2 sentences in Hindi about the story",
           "keywords": ["tag1", "tag2"],
           "sentiment": "Neutral",
           "score": 90
@@ -130,8 +134,12 @@ const aiService = {
 
       const result = await model.generateContent(prompt);
       const text = result.response.text();
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      const data = JSON.parse(cleanJson);
+      
+      // Improved JSON extraction
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON found in response");
+      
+      const data = JSON.parse(jsonMatch[0].trim());
 
       const base = this.getRawArticle(rawArticle);
       return {
@@ -139,6 +147,7 @@ const aiService = {
         title: data.headline || base.title,
         description: data.summary || base.description,
         content: data.full_article || base.content,
+        summaryHindi: data.hindi_summary || "",
         tags: data.keywords || [],
         sentiment: data.sentiment || "Neutral",
         viralScore: data.score || 70,
@@ -154,8 +163,8 @@ const aiService = {
           }
         }
       };
-    } catch (error) {
-      console.warn("[AI-SERVICE] Processing failed, using raw data.");
+    } catch (error: any) {
+      console.warn("[AI-SERVICE] Processing failed, using raw data.", error.message);
       return this.getRawArticle(rawArticle);
     }
   }
@@ -204,11 +213,11 @@ const aggregatorService = {
 
           if (article) {
             newArticles.push(article);
-            if (newsCollection) {
+            if (adminDb) {
               try {
-                await setDoc(doc(newsCollection, article.id), article);
-              } catch (e) {
-                console.error("[DB] Save failed.");
+                await adminDb.collection("articles").doc(article.id).set(article);
+              } catch (e: any) {
+                console.error("[DB] Save failed:", e.message);
               }
             }
           }
@@ -247,8 +256,8 @@ async function startServer() {
   app.get("/sitemap.xml", async (req, res) => {
     res.header("Content-Type", "application/xml");
     try {
-      const qRef = query(newsCollection, orderBy("publishedAt", "desc"), limit(100));
-      const snapshot = await getDocs(qRef);
+      if (!adminDb) throw new Error("DB offline");
+      const snapshot = await adminDb.collection("articles").orderBy("publishedAt", "desc").limit(100).get();
       const urls = snapshot.docs.map((d: any) => {
         const art = d.data();
         return `<url><loc>https://cinepulse.ai/news/${art.slug}</loc><lastmod>${art.publishedAt.split("T")[0]}</lastmod></url>`;
@@ -267,13 +276,12 @@ async function startServer() {
       let newsList: NewsArticle[] = [];
 
       // If Firestore is working, try reading from there first
-      if (newsCollection) {
+      if (adminDb) {
         try {
-          const qRef = query(newsCollection, orderBy("publishedAt", "desc"), limit(50));
-          const snapshot = await getDocs(qRef);
+          const snapshot = await adminDb.collection("articles").orderBy("publishedAt", "desc").limit(50).get();
           newsList = snapshot.docs.map((d: any) => d.data() as NewsArticle);
-        } catch (e) {
-          console.warn("[API] DB Read failed, using memory cache.");
+        } catch (e: any) {
+          console.warn("[API] DB Read failed:", e.message);
         }
       }
 

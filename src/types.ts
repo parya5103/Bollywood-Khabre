@@ -3,6 +3,7 @@ export interface NewsArticle {
   title: string;
   description: string;
   content: string;
+  summaryHindi?: string;
   author: string;
   category: "Bollywood" | "Hollywood" | "Trending" | "Reviews";
   tags: string[];

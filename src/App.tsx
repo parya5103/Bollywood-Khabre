@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Search, 
   Flame, 
   Clapperboard, 
   Bookmark, 
   User, 
-  Menu, 
-  X,
-  Share2,
-  ChevronRight,
-  TrendingUp,
+  Search,
   Filter,
-  LogOut,
+  TrendingUp,
   Settings,
   Bell,
   Sun,
   Moon,
-  Home
+  Home,
+  Activity,
+  Shield,
+  Zap,
+  Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
-import type { NewsArticle, UserPreferences } from "@/src/types";
+import type { NewsArticle } from "@/src/types";
 
 // Components
 import NewsFeed from "./components/NewsFeed";
@@ -40,7 +39,6 @@ export default function App() {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : [];
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
@@ -63,7 +61,7 @@ export default function App() {
       const data = await res.json();
       setSystemHealth(data);
     } catch (e) {
-      setSystemHealth({ status: "offline", firebase: "unknown" });
+      setSystemHealth({ status: "offline" });
     }
   };
 
@@ -89,162 +87,161 @@ export default function App() {
     );
   };
 
-  const NavItem = ({ icon: Icon, label, active, onClick, id }: { 
+  const RailItem = ({ icon: Icon, label, active, onClick }: { 
     icon: any, 
     label: string, 
     active: boolean, 
-    onClick: () => void,
-    id: string
+    onClick: () => void
   }) => (
     <button
-      id={id}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-300",
+        "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
         active 
-          ? "bg-purple-500/10 text-purple-400 border-r-2 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.1)]" 
-          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100"
+          ? "bg-accent text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]" 
+          : "text-slate-500 hover:text-white hover:bg-white/5"
       )}
     >
-      <Icon size={20} className={active ? "animate-pulse" : ""} />
-      <span className="font-medium text-sm">{label}</span>
+      <Icon size={22} className={cn("transition-transform group-hover:scale-110", active && "animate-pulse")} />
+      
+      {/* Tooltip */}
+      <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+        {label}
+      </span>
+      
+      {active && (
+        <motion.div 
+          layoutId="rail-active"
+          className="absolute -left-1 w-1 h-8 bg-accent rounded-full"
+        />
+      )}
     </button>
   );
 
   return (
-    <div className={cn(
-      "min-h-screen transition-colors duration-500 relative overflow-hidden",
-      darkMode ? "bg-[#05070A] text-slate-100" : "bg-slate-50 text-slate-900"
-    )}>
-      {/* Mesh Gradients Background */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-600/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-dark-surface text-slate-100 flex font-sans selection:bg-accent/30 tracking-tight">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyber-purple/5 rounded-full blur-[150px]" />
+      </div>
 
-      {/* Sidebar */}
-      <aside className={cn(
-        "fixed left-0 top-0 h-full glass border-r border-white/10 z-50 transition-all duration-300 overflow-hidden",
-        isSidebarOpen ? "w-64" : "w-0 md:w-20"
-      )}>
-        <div className="flex flex-col h-full p-4">
-          <div className="flex items-center gap-3 px-2 mb-10">
-            <div className="w-10 h-10 bg-gradient-to-tr from-purple-500 to-orange-500 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg shadow-purple-500/20">
-              <Clapperboard className="text-white" size={24} />
-            </div>
-            {isSidebarOpen && (
-              <h1 className="text-xl font-bold tracking-tight text-white">
-                CinePulse <span className="text-orange-400">Wire</span>
-              </h1>
-            )}
-          </div>
-
-          <nav className="flex-1 space-y-2">
-            <NavItem id="nav-home" icon={Home} label="Live Wire" active={view === "home"} onClick={() => setView("home")} />
-            <NavItem id="nav-trending" icon={Flame} label="Viral Pulse" active={view === "trending"} onClick={() => setView("trending")} />
-            <NavItem id="nav-bollywood" icon={Clapperboard} label="Bollywood" active={view === "bollywood"} onClick={() => setView("bollywood")} />
-            <NavItem id="nav-hollywood" icon={TrendingUp} label="Hollywood" active={view === "hollywood"} onClick={() => setView("hollywood")} />
-            <NavItem id="nav-reviews" icon={Filter} label="Top Reviews" active={view === "reviews"} onClick={() => setView("reviews")} />
-            <div className="h-px bg-white/10 my-4" />
-            <NavItem id="nav-saved" icon={Bookmark} label="Pinned Stories" active={view === "saved"} onClick={() => setView("saved")} />
-          </nav>
-
-
-          <div className="mt-auto space-y-2">
-            <NavItem id="nav-profile" icon={User} label="Profile" active={view === "profile"} onClick={() => setView("profile")} />
-            <button 
-              onClick={() => setDarkMode(!darkMode)}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-300 text-slate-400 hover:bg-white/5 hover:text-slate-100"
-            >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-              {isSidebarOpen && <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>}
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className={cn(
-        "transition-all duration-300 min-h-screen relative z-10 flex flex-col",
-        isSidebarOpen ? "pl-64" : "pl-0 md:pl-20"
-      )}>
-        {/* Breaking News Marquee */}
-        <div className="bg-red-600/10 border-b border-red-600/20 py-2 overflow-hidden whitespace-nowrap relative">
-          <div className="absolute left-0 top-0 bottom-0 px-4 bg-red-600 text-white text-[10px] font-black uppercase flex items-center z-10 shadow-lg">
-            Viral Now
-          </div>
-          <motion.div 
-            animate={{ x: ["100%", "-100%"] }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="inline-flex gap-12 pl-24"
-          >
-            {Array.isArray(news) && news.slice(0, 5).map((n, i) => (
-              <span key={i} className="text-[10px] font-bold text-red-500 uppercase tracking-widest flex items-center gap-2">
-                <Flame size={12} fill="currentColor" /> {n.title}
-              </span>
-            ))}
-          </motion.div>
+      {/* Control Rail */}
+      <nav className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 glass border-r border-white/5 z-[60]">
+        <div className="w-12 h-12 bg-white text-black flex items-center justify-center rounded-2xl mb-12 shadow-xl shadow-white/5 hover:rotate-12 transition-transform cursor-pointer">
+           <Clapperboard size={24} />
         </div>
 
-        {/* Header */}
-        <header className="sticky top-4 z-40 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mx-6 my-4 shadow-2xl">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
-            <div className="relative flex-1 max-w-2xl group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-400 transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search actors, directors, or movies..."
-                className="w-full bg-white/10 border border-white/5 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-sm transition-all"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="md:flex hidden items-center space-x-1 bg-white/10 rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest text-slate-300">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span>LIVE UPDATES</span>
-              </div>
-              <button className="p-2 text-slate-400 hover:text-slate-100 transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border-2 border-[#05070A]" />
-              </button>
-            </div>
+        <div className="flex flex-col gap-4 flex-1">
+          <RailItem icon={Home} label="Terminal Home" active={view === "home"} onClick={() => setView("home")} />
+          <RailItem icon={TrendingUp} label="Viral Matrix" active={view === "trending"} onClick={() => setView("trending")} />
+          <RailItem icon={Clapperboard} label="Bollywood" active={view === "bollywood"} onClick={() => setView("bollywood")} />
+          <RailItem icon={Globe} label="Hollywood" active={view === "hollywood"} onClick={() => setView("hollywood")} />
+          <RailItem icon={Filter} label="Deep Reviews" active={view === "reviews"} onClick={() => setView("reviews")} />
+          <div className="h-px w-8 bg-white/10 my-2 mx-auto" />
+          <RailItem icon={Bookmark} label="Archived Stories" active={view === "saved"} onClick={() => setView("saved")} />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <button onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <RailItem icon={User} label="Identity Profile" active={view === "profile"} onClick={() => setView("profile")} />
+        </div>
+      </nav>
+
+      {/* Main Command Center */}
+      <main className="flex-1 ml-20 flex flex-col min-h-screen relative z-10">
+        
+        {/* Dynamic Header */}
+        <header className="sticky top-0 z-50 px-8 py-6 flex items-center justify-between border-b border-white/5 bg-dark-surface/80 backdrop-blur-3xl">
+          <div className="flex items-center gap-10 flex-1">
+             <div>
+               <h1 className="text-xl font-black uppercase tracking-tighter italic-human leading-none">{view === 'home' ? 'Pulse Terminal' : view}</h1>
+               <div className="flex items-center gap-2 text-[9px] font-black uppercase text-slate-600 tracking-widest mt-1">
+                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Live Scrape Ops
+               </div>
+             </div>
+
+             <div className="relative flex-1 max-w-xl group">
+               <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
+               <input 
+                 type="text" 
+                 placeholder="Search global cine-intel nodes..."
+                 className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all placeholder:text-slate-700"
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+               />
+             </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+             <div className="flex -space-x-2">
+               {[1,2,3].map(i => (
+                 <div key={i} className="w-8 h-8 rounded-full border-2 border-dark-surface bg-slate-800 flex items-center justify-center overflow-hidden">
+                   <img src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${i}`} alt="user" />
+                 </div>
+               ))}
+               <div className="w-8 h-8 rounded-full border-2 border-dark-surface bg-dark-elevated flex items-center justify-center text-[10px] font-black text-slate-500">
+                 +12
+               </div>
+             </div>
+             <div className="h-8 w-px bg-white/10" />
+             <button className="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
+               <Bell size={20} />
+               <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-dark-surface" />
+             </button>
           </div>
         </header>
 
-        <div className="p-6 max-w-7xl mx-auto flex-1 h-full flex flex-col">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={view}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex-1"
-            >
-              {view === "profile" ? (
-                <UserProfile />
-              ) : (
-                <NewsFeed 
-                  news={view === "saved" ? (Array.isArray(news) ? news.filter(n => favorites.includes(n.id)) : []) : (Array.isArray(news) ? news : [])} 
-                  loading={loading}
-                  onArticleClick={(article) => setSelectedArticle(article)}
-                  favorites={favorites}
-                  onFavoriteToggle={toggleFavorite}
-                  systemHealth={systemHealth}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
+        {/* Viewport */}
+        <div className="flex-1 p-10 max-w-[1600px] mx-auto w-full">
+           <AnimatePresence mode="wait">
+             <motion.div
+               key={view}
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={{ opacity: 0, y: -20 }}
+               transition={{ duration: 0.4, ease: "easeOut" }}
+             >
+               {view === "profile" ? (
+                 <UserProfile />
+               ) : (
+                 <NewsFeed 
+                   news={view === "saved" ? (news.filter(n => favorites.includes(n.id))) : news} 
+                   loading={loading}
+                   onArticleClick={(article) => setSelectedArticle(article)}
+                   favorites={favorites}
+                   onFavoriteToggle={toggleFavorite}
+                   systemHealth={systemHealth}
+                 />
+               )}
+             </motion.div>
+           </AnimatePresence>
         </div>
 
-        {/* Minimal Static Footer */}
-        <footer className="px-8 py-4 bg-white/5 backdrop-blur-md border-t border-white/10 flex items-center justify-between opacity-60">
-          <div className="flex space-x-6 text-[10px] font-bold tracking-widest uppercase text-slate-500">
-            <span>CinePulse AI • 2026</span>
-          </div>
-          <div className="flex space-x-6 text-[10px] font-bold tracking-widest uppercase items-center">
-            <span className="text-orange-400 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span> DEPLOYED NODE</span>
-          </div>
+        {/* Terminal Footer */}
+        <footer className="px-10 py-8 mt-auto border-t border-white/5 bg-dark-elevated/50">
+           <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-8">
+              <div className="flex items-center gap-10">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase text-slate-600 tracking-widest mb-1">Architecture</span>
+                  <span className="text-xs font-bold text-white uppercase italic-human">CinePulse Engine v2.4</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase text-slate-600 tracking-widest mb-1">Compute Node</span>
+                  <span className="text-xs font-bold text-cyber-purple uppercase italic-human tracking-tighter">Gemini 1.5 Flash - Autonomous</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-8">
+                 <div className="flex items-center gap-3 px-4 py-2 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                    <Shield size={14} className="text-accent" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Zero-Trust Persistent State</span>
+                 </div>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">© 2026 CinePulse • Autonomous Intel</p>
+              </div>
+           </div>
         </footer>
       </main>
 
