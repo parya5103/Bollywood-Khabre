@@ -19,4 +19,9 @@ const ArticleSchema = new mongoose.Schema({
     }
 });
 
+// Indexes for faster querying
+ArticleSchema.index({ publishedAt: -1 });
+ArticleSchema.index({ viralScore: -1 });
+ArticleSchema.index({ category: 1, publishedAt: -1 });
+
 module.exports = mongoose.model('Article', ArticleSchema);
