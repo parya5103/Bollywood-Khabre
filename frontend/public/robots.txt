@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://cinepulse.ai
+
+# Sitemaps
+Sitemap: https://cinepulse.ai/sitemap.xml
