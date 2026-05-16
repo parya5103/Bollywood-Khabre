@@ -20,10 +20,25 @@ app.use('/api/admin', adminRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'online' }));
 
 // Database connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cinepulse';
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+async function connectDB() {
+    try {
+        if (process.env.NODE_ENV !== 'production' && !process.env.MONGODB_URI) {
+            console.log('No MONGODB_URI provided and not in production. Using MongoMemoryServer...');
+            const { MongoMemoryServer } = require('mongodb-memory-server');
+            const mongoServer = await MongoMemoryServer.create();
+            const mongoUri = mongoServer.getUri();
+            await mongoose.connect(mongoUri);
+            console.log(`Connected to MongoDB Memory Server at ${mongoUri}`);
+        } else {
+            const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cinepulse';
+            await mongoose.connect(MONGODB_URI);
+            console.log('Connected to MongoDB');
+        }
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }
+}
+connectDB();
 
 // Scheduled jobs
 cron.schedule('*/30 * * * *', async () => {
@@ -40,5 +55,5 @@ cron.schedule('0 12 * * *', async () => {
 app.listen(PORT, () => {
     console.log(`Backend server running on port ${PORT}`);
     // Run initial scrape immediately in dev or if required
-    // setTimeout(runScrapers, 5000);
+    setTimeout(runScrapers, 5000);
 });
