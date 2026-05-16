@@ -107,6 +107,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 <span>{formatDate(featured.publishedAt)}</span>
               </div>
               <button 
+                aria-label={favorites.includes(featured.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(featured.id, e)}
                 className={cn(
                   "p-4 rounded-2xl border border-white/10 transition-all",
@@ -151,6 +152,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 </div>
               </div>
               <button 
+                aria-label={favorites.includes(article.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(article.id, e)}
                 className={cn(
                   "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all",

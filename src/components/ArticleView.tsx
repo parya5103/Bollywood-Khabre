@@ -46,7 +46,7 @@ export default function ArticleView({ article, isOpen, onClose, isSaved, onToggl
         exit={{ opacity: 0, y: 100, scale: 0.95 }}
         className="relative w-full max-w-6xl max-h-[90vh] bg-dark-surface border border-white/10 rounded-[3rem] shadow-[0_0_150px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col md:flex-row"
       >
-        <button onClick={onClose} className="absolute top-8 right-8 z-[110] p-4 bg-white/10 hover:bg-accent hover:text-white rounded-3xl transition-all"><X size={24} /></button>
+        <button aria-label="Close article" onClick={onClose} className="absolute top-8 right-8 z-[110] p-4 bg-white/10 hover:bg-accent hover:text-white rounded-3xl transition-all"><X size={24} /></button>
 
         {/* Hero Poster Section */}
         <div className="md:w-5/12 relative bg-black overflow-hidden group">
@@ -161,7 +161,7 @@ export default function ArticleView({ article, isOpen, onClose, isSaved, onToggl
                   >
                     <Bookmark size={20} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? "Intel Secured" : "Secure Intel"}
                   </button>
-                  <button onClick={() => share('twitter')} className="w-20 py-5 bg-white/[0.03] border border-white/10 rounded-[2rem] flex items-center justify-center hover:bg-white/10 text-white transition-all"><Share2 size={20} /></button>
+                  <button aria-label="Share on Twitter" onClick={() => share('twitter')} className="w-20 py-5 bg-white/[0.03] border border-white/10 rounded-[2rem] flex items-center justify-center hover:bg-white/10 text-white transition-all"><Share2 size={20} /></button>
                </div>
             </div>
 
