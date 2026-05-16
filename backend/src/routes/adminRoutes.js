@@ -10,9 +10,13 @@ const router = express.Router();
 router.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    // In production, validate against process.env.ADMIN_USERNAME and process.env.ADMIN_PASSWORD
-    if (username === (process.env.ADMIN_USERNAME || 'admin') && password === (process.env.ADMIN_PASSWORD || 'cinepulse2026')) {
-        const token = jwt.sign({ username }, process.env.JWT_SECRET || 'super_secret_jwt_key_2026', { expiresIn: '24h' });
+    if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+        console.error("CRITICAL: Missing admin credentials or JWT secret in environment variables.");
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+        const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '24h' });
         res.json({ token });
     } else {
         res.status(401).json({ error: 'Invalid credentials' });
