@@ -7,9 +7,11 @@ export default function AdminDashboard() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/admin/login`, {
             method: 'POST',
@@ -25,6 +27,8 @@ export default function AdminDashboard() {
         }
     } catch (err) {
         setMessage("Connection error");
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -49,9 +53,17 @@ export default function AdminDashboard() {
           <div className="max-w-md mx-auto mt-20 p-8 bg-slate-900 rounded-xl">
               <h2 className="text-2xl font-bold mb-6 text-orange-500">Admin Login</h2>
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                  <input type="text" placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} className="p-3 bg-slate-800 rounded-md text-white" />
-                  <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="p-3 bg-slate-800 rounded-md text-white" />
-                  <button type="submit" className="p-3 bg-orange-600 hover:bg-orange-700 font-bold rounded-md text-white">Login</button>
+                  <div className="flex flex-col gap-1">
+                      <label htmlFor="username" className="text-sm font-medium text-slate-300">Username</label>
+                      <input id="username" type="text" placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} className="p-3 bg-slate-800 rounded-md text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                      <label htmlFor="password" className="text-sm font-medium text-slate-300">Password</label>
+                      <input id="password" type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="p-3 bg-slate-800 rounded-md text-white" />
+                  </div>
+                  <button type="submit" disabled={isSubmitting} className="p-3 bg-orange-600 hover:bg-orange-700 font-bold rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isSubmitting ? "Logging in..." : "Login"}
+                  </button>
               </form>
               {message && <p className="mt-4 text-red-400">{message}</p>}
           </div>
