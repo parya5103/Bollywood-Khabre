@@ -95,6 +95,8 @@ export default function App() {
   }) => (
     <button
       onClick={onClick}
+      aria-label={label}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
         active 
@@ -105,7 +107,7 @@ export default function App() {
       <Icon size={22} className={cn("transition-transform group-hover:scale-110", active && "animate-pulse")} />
       
       {/* Tooltip */}
-      <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+      <span aria-hidden="true" className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
         {label}
       </span>
       
@@ -143,7 +145,7 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <button onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
+          <button onClick={() => setDarkMode(!darkMode)} aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <RailItem icon={User} label="Identity Profile" active={view === "profile"} onClick={() => setView("profile")} />
@@ -167,6 +169,7 @@ export default function App() {
                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
                <input 
                  type="text" 
+                 aria-label="Search global cine-intel nodes"
                  placeholder="Search global cine-intel nodes..."
                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all placeholder:text-slate-700"
                  value={searchQuery}
@@ -187,7 +190,7 @@ export default function App() {
                </div>
              </div>
              <div className="h-8 w-px bg-white/10" />
-             <button className="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
+             <button aria-label="View notifications" className="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
                <Bell size={20} />
                <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-dark-surface" />
              </button>
