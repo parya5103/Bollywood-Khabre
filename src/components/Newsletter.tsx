@@ -66,6 +66,7 @@ export default function Newsletter() {
                 <div className="relative group">
                   <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-accent transition-colors transition-all" size={20} />
                   <input 
+                    aria-label="Email address"
                     type="email" 
                     placeholder="ENTER OPERATOR EMAIL..." 
                     value={email}
