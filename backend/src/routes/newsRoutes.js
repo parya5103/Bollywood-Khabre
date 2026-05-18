@@ -2,19 +2,26 @@ const express = require('express');
 const Article = require('../models/Article');
 const router = express.Router();
 
+// Escapes special characters for use in a regular expression
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 router.get('/', async (req, res) => {
     try {
         const { category, q, limit = 50 } = req.query;
         let query = {};
 
         if (category && category !== 'trending' && category !== 'home') {
-            query.category = new RegExp(`^${category}$`, 'i');
+            const escapedCategory = escapeRegex(category);
+            query.category = new RegExp(`^${escapedCategory}$`, 'i');
         }
 
         if (q) {
+            const escapedQ = escapeRegex(q);
             query.$or = [
-                { title: new RegExp(q, 'i') },
-                { tags: new RegExp(q, 'i') }
+                { title: new RegExp(escapedQ, 'i') },
+                { tags: new RegExp(escapedQ, 'i') }
             ];
         }
 
