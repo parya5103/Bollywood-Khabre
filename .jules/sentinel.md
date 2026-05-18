@@ -1,4 +1,4 @@
-## 2024-05-17 - Fix Hardcoded Fallback Credentials and Secrets
-**Vulnerability:** The admin login route and authentication middleware were falling back to hardcoded secrets (`admin`, `cinepulse2026`, `super_secret_jwt_key_2026`) when environment variables were absent.
-**Learning:** This "fail-open" pattern allows attackers to potentially bypass authentication if the production server environment is misconfigured or fails to load `.env`. Hardcoded fallbacks are extremely dangerous and render environment isolation moot.
-**Prevention:** Implement "fail-secure" practices. Check for the presence of required environment variables early (e.g., during startup or at the start of a route handler) and fail loudly (return a 500 error or crash the app) if they are missing. Never hardcode credentials in source code.
+## 2024-05-18 - Missing Input Length Constraints in MongoDB Schema
+**Vulnerability:** String fields in Mongoose schema `Article.js` lacked `maxlength` properties.
+**Learning:** By omitting length restrictions, the application was susceptible to Denial of Service (DoS) from attackers submitting payloads with massive strings to exhaust memory/disk or degrade performance.
+**Prevention:** Always add `maxlength` limits to String inputs in database schemas to bound resource consumption on the DB and server.
