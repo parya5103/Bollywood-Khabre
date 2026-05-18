@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
 
 const ArticleSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    content: { type: String, required: true },
-    description: String,
-    author: { type: String, default: 'CinePulse AI Bot' },
-    category: { type: String, default: 'News' },
-    tags: [String],
-    imageUrl: String,
-    sourceUrl: { type: String, unique: true, sparse: true }, // For anti-duplicate
+    title: { type: String, required: true, maxlength: 500 },
+    slug: { type: String, required: true, unique: true, maxlength: 500 },
+    content: { type: String, required: true, maxlength: 50000 },
+    description: { type: String, maxlength: 2000 },
+    author: { type: String, default: 'CinePulse AI Bot', maxlength: 200 },
+    category: { type: String, default: 'News', maxlength: 100 },
+    tags: [{ type: String, maxlength: 100 }],
+    imageUrl: { type: String, maxlength: 2048 },
+    sourceUrl: { type: String, unique: true, sparse: true, maxlength: 2048 }, // For anti-duplicate
     publishedAt: { type: Date, default: Date.now },
     viralScore: { type: Number, default: 0 },
     seoData: {
-        metaTitle: String,
-        metaDescription: String,
-        keywords: [String]
+        metaTitle: { type: String, maxlength: 500 },
+        metaDescription: { type: String, maxlength: 2000 },
+        keywords: [{ type: String, maxlength: 100 }]
     }
 });
 
