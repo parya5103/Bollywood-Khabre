@@ -34,6 +34,7 @@ export default function App() {
   const [view, setView] = useState<View>("home");
   const [systemHealth, setSystemHealth] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() => {
     const saved = localStorage.getItem("favorites");
@@ -41,11 +42,22 @@ export default function App() {
   });
   const [darkMode, setDarkMode] = useState(true);
 
+  // ⚡ Bolt Performance Optimization:
+  // Debounce the search input to prevent firing an API request on every keystroke.
+  // This reduces backend load and improves frontend responsiveness.
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(timerId);
+  }, [searchQuery]);
+
   useEffect(() => {
     if (view !== "profile") {
       fetchNews();
     }
-  }, [view, searchQuery]);
+  }, [view, debouncedSearchQuery]);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -69,7 +81,7 @@ export default function App() {
     setLoading(true);
     try {
       const category = view === "home" ? "" : view;
-      const url = `/api/news?${category && category !== "saved" ? `category=${category}&` : ""}${searchQuery ? `q=${searchQuery}` : ""}`;
+      const url = `/api/news?${category && category !== "saved" ? `category=${category}&` : ""}${debouncedSearchQuery ? `q=${debouncedSearchQuery}` : ""}`;
       const res = await fetch(url);
       const data = await res.json();
       setNews(data);
