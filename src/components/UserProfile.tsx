@@ -76,18 +76,18 @@ export default function UserProfile() {
                    <div className="space-y-12">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                        <div className="space-y-4">
-                         <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Core Identifier</label>
-                         <input type="text" defaultValue="Pratik Gupta" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all text-sm font-bold placeholder:text-slate-800" />
+                         <label htmlFor="coreIdentifier" className="text-[10px] font-black text-slate-600 uppercase tracking-widest block cursor-pointer hover:text-slate-400 mb-1 transition-colors">Core Identifier</label>
+                         <input id="coreIdentifier" type="text" defaultValue="Pratik Gupta" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all text-sm font-bold placeholder:text-slate-800" />
                        </div>
                        <div className="space-y-4">
-                         <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Communications Link</label>
-                         <input type="email" defaultValue="pratik@cinepulse.ai" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all text-sm font-bold placeholder:text-slate-800" />
+                         <label htmlFor="communicationsLink" className="text-[10px] font-black text-slate-600 uppercase tracking-widest block cursor-pointer hover:text-slate-400 mb-1 transition-colors">Communications Link</label>
+                         <input id="communicationsLink" type="email" defaultValue="pratik@cinepulse.ai" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all text-sm font-bold placeholder:text-slate-800" />
                        </div>
                      </div>
                      
                      <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Psychographics / Bio</label>
-                        <textarea defaultValue="Film analyst. Neural node connected to CinePulse since 2024. Expert in Bollywood/Hollywood synthesis." className="w-full h-40 bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all resize-none text-sm font-bold" />
+                        <label htmlFor="psychographicsBio" className="text-[10px] font-black text-slate-600 uppercase tracking-widest block cursor-pointer hover:text-slate-400 mb-1 transition-colors">Psychographics / Bio</label>
+                        <textarea id="psychographicsBio" defaultValue="Film analyst. Neural node connected to CinePulse since 2024. Expert in Bollywood/Hollywood synthesis." className="w-full h-40 bg-white/[0.02] border border-white/10 rounded-2xl p-5 focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all resize-none text-sm font-bold" />
                      </div>
 
                      <div className="flex items-center gap-6 pt-10">
