@@ -41,10 +41,15 @@ export default function App() {
   });
   const [darkMode, setDarkMode] = useState(true);
 
+  // ⚡ Bolt: Debounce search input to prevent excessive API calls
   useEffect(() => {
-    if (view !== "profile") {
+    if (view === "profile") return;
+
+    const timeoutId = setTimeout(() => {
       fetchNews();
-    }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [view, searchQuery]);
 
   useEffect(() => {
