@@ -7,14 +7,18 @@ router.get('/', async (req, res) => {
         const { category, q, limit = 50 } = req.query;
         let query = {};
 
-        if (category && category !== 'trending' && category !== 'home') {
-            query.category = new RegExp(`^${category}$`, 'i');
+        // 🛡️ Sentinel: Enforce string types and escape RegExp characters to prevent ReDoS and NoSQL Injection
+        if (category && typeof category === 'string' && category !== 'trending' && category !== 'home') {
+            const safeCategory = category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            query.category = new RegExp(`^${safeCategory}$`, 'i');
         }
 
-        if (q) {
+        // 🛡️ Sentinel: Enforce string types and escape RegExp characters to prevent ReDoS and NoSQL Injection
+        if (q && typeof q === 'string') {
+            const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             query.$or = [
-                { title: new RegExp(q, 'i') },
-                { tags: new RegExp(q, 'i') }
+                { title: new RegExp(safeQ, 'i') },
+                { tags: new RegExp(safeQ, 'i') }
             ];
         }
 
