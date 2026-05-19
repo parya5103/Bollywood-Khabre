@@ -28,6 +28,37 @@ import ArticleView from "./components/ArticleView";
 
 type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending" | "reviews";
 
+const RailItem = React.memo(({ icon: Icon, label, active, onClick }: {
+  icon: any,
+  label: string,
+  active: boolean,
+  onClick: () => void
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
+      active
+        ? "bg-accent text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
+        : "text-slate-500 hover:text-white hover:bg-white/5"
+    )}
+  >
+    <Icon size={22} className={cn("transition-transform group-hover:scale-110", active && "animate-pulse")} />
+
+    {/* Tooltip */}
+    <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+      {label}
+    </span>
+
+    {active && (
+      <motion.div
+        layoutId="rail-active"
+        className="absolute -left-1 w-1 h-8 bg-accent rounded-full"
+      />
+    )}
+  </button>
+));
+
 export default function App() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,37 +117,6 @@ export default function App() {
       prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
     );
   };
-
-  const RailItem = ({ icon: Icon, label, active, onClick }: { 
-    icon: any, 
-    label: string, 
-    active: boolean, 
-    onClick: () => void
-  }) => (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
-        active 
-          ? "bg-accent text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]" 
-          : "text-slate-500 hover:text-white hover:bg-white/5"
-      )}
-    >
-      <Icon size={22} className={cn("transition-transform group-hover:scale-110", active && "animate-pulse")} />
-      
-      {/* Tooltip */}
-      <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
-        {label}
-      </span>
-      
-      {active && (
-        <motion.div 
-          layoutId="rail-active"
-          className="absolute -left-1 w-1 h-8 bg-accent rounded-full"
-        />
-      )}
-    </button>
-  );
 
   return (
     <div className="min-h-screen bg-dark-surface text-slate-100 flex font-sans selection:bg-accent/30 tracking-tight">
