@@ -95,6 +95,7 @@ export default function App() {
   }) => (
     <button
       onClick={onClick}
+      aria-label={label}
       className={cn(
         "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
         active 
@@ -143,7 +144,7 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <button onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
+          <button aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <RailItem icon={User} label="Identity Profile" active={view === "profile"} onClick={() => setView("profile")} />
@@ -187,7 +188,7 @@ export default function App() {
                </div>
              </div>
              <div className="h-8 w-px bg-white/10" />
-             <button className="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
+             <button aria-label="View notifications" className="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
                <Bell size={20} />
                <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-dark-surface" />
              </button>
