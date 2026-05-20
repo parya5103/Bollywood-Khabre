@@ -2,26 +2,39 @@ const express = require('express');
 const Article = require('../models/Article');
 const router = express.Router();
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 router.get('/', async (req, res) => {
     try {
-        const { category, q, limit = 50 } = req.query;
+        const { category, q } = req.query;
+        let limit = parseInt(req.query.limit, 10);
+        if (isNaN(limit) || limit < 1) {
+            limit = 50;
+        } else if (limit > 100) {
+            limit = 100;
+        }
+
         let query = {};
 
         if (category && category !== 'trending' && category !== 'home') {
-            query.category = new RegExp(`^${category}$`, 'i');
+            const escapedCategory = escapeRegExp(category);
+            query.category = new RegExp(`^${escapedCategory}$`, 'i');
         }
 
         if (q) {
+            const escapedQ = escapeRegExp(q);
             query.$or = [
-                { title: new RegExp(q, 'i') },
-                { tags: new RegExp(q, 'i') }
+                { title: new RegExp(escapedQ, 'i') },
+                { tags: new RegExp(escapedQ, 'i') }
             ];
         }
 
-        let articles = await Article.find(query).sort({ publishedAt: -1 }).limit(Number(limit));
+        let articles = await Article.find(query).sort({ publishedAt: -1 }).limit(limit);
 
         if (category === 'trending') {
-             articles = await Article.find().sort({ viralScore: -1 }).limit(Number(limit));
+             articles = await Article.find().sort({ viralScore: -1 }).limit(limit);
         }
 
         res.json(articles);
