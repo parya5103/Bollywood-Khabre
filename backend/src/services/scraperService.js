@@ -9,10 +9,12 @@ const RSS_SOURCES = [
     { url: "https://variety.com/feed/", category: "Hollywood" }
 ];
 
-async function processAndSaveArticle(rawArticle) {
+async function processAndSaveArticle(rawArticle, skipDuplicateCheck = false) {
     try {
-        const exists = await Article.findOne({ sourceUrl: rawArticle.link });
-        if (exists) return; // Skip duplicates
+        if (!skipDuplicateCheck) {
+            const exists = await Article.findOne({ sourceUrl: rawArticle.link });
+            if (exists) return; // Skip duplicates
+        }
 
         let aiData = await rewriteArticle(rawArticle.description || rawArticle.title, "Viral");
 
@@ -55,10 +57,20 @@ async function runScrapers() {
         allRawArticles = allRawArticles.concat(items);
     }
 
+    // Fetch all existing URLs to prevent N+1 query issue
+    const validArticles = allRawArticles.filter(a => a.title && a.link);
+    const sourceUrls = validArticles.map(a => a.link);
+    const existingArticles = await Article.find({ sourceUrl: { $in: sourceUrls } }).select('sourceUrl').lean();
+    const existingUrlSet = new Set(existingArticles.map(a => a.sourceUrl));
+
     // Process articles sequentially to not overload Ollama
-    for (const rawArticle of allRawArticles) {
-        if (!rawArticle.title || !rawArticle.link) continue;
-        await processAndSaveArticle(rawArticle);
+    for (const rawArticle of validArticles) {
+        if (existingUrlSet.has(rawArticle.link)) continue;
+
+        // Add to set to prevent processing duplicates within the same batch
+        existingUrlSet.add(rawArticle.link);
+
+        await processAndSaveArticle(rawArticle, true);
     }
     console.log("Scrape cycle complete.");
 }
