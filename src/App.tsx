@@ -45,7 +45,7 @@ export default function App() {
   // ⚡ Bolt: Debounce search input to prevent API calls on every keystroke
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
+      setDebouncedQuery(searchQuery.trim());
     }, 500);
     return () => clearTimeout(timer);
   }, [searchQuery]);
