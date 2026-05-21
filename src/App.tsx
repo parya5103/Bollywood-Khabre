@@ -54,7 +54,7 @@ export default function App() {
     if (view !== "profile") {
       fetchNews();
     }
-  }, [view, debouncedQuery]);
+  }, [view, debouncedQuery, fetchNews]);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
