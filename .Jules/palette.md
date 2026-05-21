@@ -3,3 +3,6 @@
 ## 2024-05-17 - Implicit vs Explicit Form Labels
 **Learning:** Found instances where `<label>` elements were placed adjacent to inputs without `htmlFor`/`id` linking. This visually looks correct but breaks screen reader association and click-to-focus behavior for mouse users.
 **Action:** Always use explicit linking (`htmlFor` on `<label>` matching `id` on input) even when inputs are visually adjacent to their labels. Additionally, add `cursor-pointer` to explicitly linked labels to encourage user interaction.
+## 2024-05-21 - Newsletter Form Accessibility and Feedback
+**Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
+**Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
