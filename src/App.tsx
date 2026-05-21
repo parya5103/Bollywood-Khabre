@@ -30,7 +30,7 @@ type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending
 
 // Memoized to prevent unnecessary re-renders on App state changes
 const RailItem = React.memo(({ icon: Icon, label, active, onClick }: {
-  icon: any,
+  icon: React.ElementType,
   label: string,
   active: boolean,
   onClick: () => void
