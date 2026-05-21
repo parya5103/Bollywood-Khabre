@@ -31,10 +31,12 @@ router.get('/', async (req, res) => {
             ];
         }
 
-        let articles = await Article.find(query).sort({ publishedAt: -1 }).limit(limit);
+        // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
+        let articles = await Article.find(query).sort({ publishedAt: -1 }).limit(limit).lean();
 
         if (category === 'trending') {
-             articles = await Article.find().sort({ viralScore: -1 }).limit(limit);
+             // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
+             articles = await Article.find().sort({ viralScore: -1 }).limit(limit).lean();
         }
 
         res.json(articles);
@@ -46,7 +48,8 @@ router.get('/', async (req, res) => {
 
 router.get('/:slug', async (req, res) => {
     try {
-        const article = await Article.findOne({ slug: req.params.slug });
+        // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
+        const article = await Article.findOne({ slug: req.params.slug }).lean();
         if (!article) return res.status(404).json({ error: 'Not found' });
         res.json(article);
     } catch (error) {
