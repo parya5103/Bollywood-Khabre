@@ -1,1 +1,5 @@
 ## 2026-05-16 - Dynamic ARIA Labels in React\n**Learning:** Implementing accessibility for interactive stateful components requires dynamic `aria-label` attributes that accurately reflect the current state (e.g., toggling between 'Save article' and 'Remove from saved' based on a boolean value or array inclusion).\n**Action:** Always verify if an interactive element has multiple states. If so, ensure its `aria-label` updates dynamically to provide accurate context to screen readers, rather than hardcoding a single, static action description.
+
+## 2024-05-17 - Implicit vs Explicit Form Labels
+**Learning:** Found instances where `<label>` elements were placed adjacent to inputs without `htmlFor`/`id` linking. This visually looks correct but breaks screen reader association and click-to-focus behavior for mouse users.
+**Action:** Always use explicit linking (`htmlFor` on `<label>` matching `id` on input) even when inputs are visually adjacent to their labels. Additionally, add `cursor-pointer` to explicitly linked labels to encourage user interaction.
