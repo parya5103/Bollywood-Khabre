@@ -25,8 +25,9 @@ import type { NewsArticle } from "@/src/types";
 import NewsFeed from "./components/NewsFeed";
 import UserProfile from "./components/UserProfile";
 import ArticleView from "./components/ArticleView";
+import { Upgrade } from "./components/Upgrade";
 
-type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending" | "reviews";
+type View = "home" | "bollywood" | "hollywood" | "profile" | "saved" | "trending" | "reviews" | "upgrade";
 
 export default function App() {
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -138,6 +139,7 @@ export default function App() {
           <RailItem icon={TrendingUp} label="Viral Matrix" active={view === "trending"} onClick={() => setView("trending")} />
           <RailItem icon={Clapperboard} label="Bollywood" active={view === "bollywood"} onClick={() => setView("bollywood")} />
           <RailItem icon={Globe} label="Hollywood" active={view === "hollywood"} onClick={() => setView("hollywood")} />
+          <RailItem icon={Zap} label="Upgrade to Pro" active={view === "upgrade"} onClick={() => setView("upgrade")} />
           <RailItem icon={Filter} label="Deep Reviews" active={view === "reviews"} onClick={() => setView("reviews")} />
           <div className="h-px w-8 bg-white/10 my-2 mx-auto" />
           <RailItem icon={Bookmark} label="Archived Stories" active={view === "saved"} onClick={() => setView("saved")} />
@@ -207,6 +209,8 @@ export default function App() {
              >
                {view === "profile" ? (
                  <UserProfile />
+               ) : view === "upgrade" ? (
+                 <Upgrade />
                ) : (
                  <NewsFeed 
                    news={view === "saved" ? (news.filter(n => favorites.includes(n.id))) : news} 
