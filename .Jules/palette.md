@@ -6,3 +6,7 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+
+## 2026-05-22 - Keyboard Access for Custom Hover Tooltips and Semantic Elements
+**Learning:** Tooltips that appear on `group-hover` are often invisible to keyboard-only users who navigate via the Tab key. In addition, interactive elements like app logos with `cursor-pointer` must be rendered as semantic `<button>`s (or `<a>` tags) with appropriate `aria-label`s, so screen readers can interpret them properly and keyboard users can activate them.
+**Action:** When implementing `group-hover` tooltips, always add `group-focus-visible:opacity-100` so they appear on focus. Additionally, ensure all interactive "clickable" elements use semantic HTML tags (`<button>`) and explicitly add `focus-visible:ring-2` to provide clear visual feedback during keyboard navigation.
