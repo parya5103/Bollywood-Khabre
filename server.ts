@@ -247,6 +247,9 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Security Enhancement: Add Helmet for security headers
+  app.use(helmet({ contentSecurityPolicy: false })); // Disabled CSP to avoid breaking inline scripts/styles in dev
+
   // SEO Infrastructure
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
