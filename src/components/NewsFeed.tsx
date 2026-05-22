@@ -73,8 +73,18 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
       {/* Featured Headline Section */}
       {featured && (
         <section 
+          role="group"
+          tabIndex={0}
+          aria-label={`Read featured article: ${featured.title}`}
           onClick={() => onArticleClick(featured)}
-          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700"
+          onKeyDown={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onArticleClick(featured);
+            }
+          }}
+          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark-surface"
         >
           <div className="lg:col-span-7 relative h-[60vh] lg:h-auto overflow-hidden">
             <img 
@@ -110,7 +120,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(featured.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(featured.id, e)}
                 className={cn(
-                  "p-4 rounded-2xl border border-white/10 transition-all",
+                  "p-4 rounded-2xl border border-white/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark-elevated",
                   favorites.includes(featured.id) ? "bg-accent border-accent text-white" : "text-white/40 hover:text-white"
                 )}
               >
@@ -129,8 +139,18 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            role="group"
+            tabIndex={0}
+            aria-label={`Read article: ${article.title}`}
             onClick={() => onArticleClick(article)}
-            className="group cursor-pointer flex flex-col h-full"
+            onKeyDown={(e) => {
+              if (e.target !== e.currentTarget) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onArticleClick(article);
+              }
+            }}
+            className="group cursor-pointer flex flex-col h-full rounded-[2.5rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-dark-surface"
           >
             <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden mb-8 border border-white/10 shadow-black shadow-xl">
               <img 
@@ -155,7 +175,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(article.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(article.id, e)}
                 className={cn(
-                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all",
+                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black/50",
                   favorites.includes(article.id) ? "bg-accent border-accent text-white" : "bg-black/20 text-white hover:bg-black/40"
                 )}
               >
