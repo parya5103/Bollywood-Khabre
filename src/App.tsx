@@ -43,9 +43,13 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (view !== "profile") {
-      fetchNews();
-    }
+    // ⚡ Bolt: Debounce search input to reduce API calls on every keystroke
+    const timeoutId = setTimeout(() => {
+      if (view !== "profile") {
+        fetchNews();
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
   }, [view, searchQuery]);
 
   useEffect(() => {
