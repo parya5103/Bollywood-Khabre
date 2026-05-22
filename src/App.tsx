@@ -98,16 +98,16 @@ export default function App() {
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500",
+        "group relative flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
         active 
           ? "bg-accent text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]" 
           : "text-slate-500 hover:text-white hover:bg-white/5"
       )}
     >
-      <Icon size={22} className={cn("transition-transform group-hover:scale-110", active && "animate-pulse")} />
+      <Icon size={22} className={cn("transition-transform group-hover:scale-110 group-focus-visible:scale-110", active && "animate-pulse")} />
       
       {/* Tooltip */}
-      <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+      <span className="absolute left-[calc(100%+16px)] px-3 py-1.5 bg-dark-elevated border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
         {label}
       </span>
       
@@ -130,9 +130,13 @@ export default function App() {
 
       {/* Control Rail */}
       <nav className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 glass border-r border-white/5 z-[60]">
-        <div className="w-12 h-12 bg-white text-black flex items-center justify-center rounded-2xl mb-12 shadow-xl shadow-white/5 hover:rotate-12 transition-transform cursor-pointer">
+        <button
+          aria-label="Home"
+          onClick={() => setView("home")}
+          className="w-12 h-12 bg-white text-black flex items-center justify-center rounded-2xl mb-12 shadow-xl shadow-white/5 hover:rotate-12 transition-transform cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
            <Clapperboard size={24} />
-        </div>
+        </button>
 
         <div className="flex flex-col gap-4 flex-1">
           <RailItem icon={Home} label="Terminal Home" active={view === "home"} onClick={() => setView("home")} />
@@ -146,7 +150,7 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <button aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors">
+          <button aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(!darkMode)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <RailItem icon={User} label="Identity Profile" active={view === "profile"} onClick={() => setView("profile")} />
