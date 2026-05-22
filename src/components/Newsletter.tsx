@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Mail, CheckCircle, ArrowRight, Zap, Target, Signal } from "lucide-react";
+import { Mail, CheckCircle, ArrowRight, Zap, Target, Signal, Loader2 } from "lucide-react";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -68,6 +68,7 @@ export default function Newsletter() {
                   <input 
                     type="email" 
                     placeholder="ENTER OPERATOR EMAIL..." 
+                    aria-label="Operator email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-white/[0.02] border border-white/10 rounded-[1.8rem] py-6 pl-16 pr-8 text-xs font-black text-white placeholder-slate-800 outline-none focus:ring-1 focus:ring-accent transition-all tracking-[0.2em]"
@@ -77,9 +78,16 @@ export default function Newsletter() {
                 <button 
                   type="submit"
                   disabled={status === "loading"}
+                  aria-busy={status === "loading"}
+                  aria-live="polite"
                   className="w-full bg-accent hover:bg-accent-deep disabled:opacity-50 text-white font-black py-6 rounded-[1.8rem] transition-all shadow-accent/20 shadow-2xl flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.3em]"
                 >
-                  {status === "loading" ? "Initializing Link..." : (
+                  {status === "loading" ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Initializing Link...
+                    </>
+                  ) : (
                     <>
                       Secure Intelligence Path
                       <ArrowRight size={18} />
