@@ -12,9 +12,11 @@ interface Props {
   favorites: string[];
   onFavoriteToggle: (id: string, e: React.MouseEvent) => void;
   systemHealth?: any;
+  emptyMessageTitle?: string;
+  emptyMessageDesc?: string;
 }
 
-export default function NewsFeed({ news, loading, onArticleClick, favorites, onFavoriteToggle, systemHealth }: Props) {
+export default function NewsFeed({ news, loading, onArticleClick, favorites, onFavoriteToggle, systemHealth, emptyMessageTitle, emptyMessageDesc }: Props) {
   if (loading) {
     return (
       <div className="space-y-12">
@@ -39,9 +41,11 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
           <div className="absolute inset-0 bg-accent/20 blur-[100px] rounded-full" />
           <div className="relative bg-dark-elevated border border-white/10 p-16 rounded-[4rem] text-center max-w-2xl shadow-[0_0_80px_rgba(0,0,0,0.5)]">
             <Zap size={48} className="text-accent mx-auto mb-8 animate-pulse" />
-            <h2 className="text-4xl font-black uppercase italic-human text-white mb-6">Autonomous Engine Initializing</h2>
+            <h2 className="text-4xl font-black uppercase italic-human text-white mb-6">
+              {emptyMessageTitle || "Autonomous Engine Initializing"}
+            </h2>
             <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs leading-loose opacity-60">
-              CinePulse AI is currently decrypting global entertainment RSS nodes. Intelligence synthesis in progress.
+              {emptyMessageDesc || "CinePulse AI is currently decrypting global entertainment RSS nodes. Intelligence synthesis in progress."}
             </p>
           </div>
         </motion.div>

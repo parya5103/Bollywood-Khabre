@@ -6,3 +6,6 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+## 2024-05-23 - Context-Aware Empty States
+**Learning:** Hardcoded "Initializing" messages on empty states (like 0 search results or empty saved items) break user trust when they know the system is done loading.
+**Action:** Always provide context-aware empty state text (e.g., "No Archived Intelligence") based on the current view or filter, rather than generic placeholders.
