@@ -6,3 +6,7 @@
 **Vulnerability:** The `newsRoutes.js` endpoints passed `q` and `category` parameters directly into `new RegExp(param, 'i')` without sanitization, and the `limit` parameter was unbounded.
 **Learning:** This could allow a malicious user to crash the backend with a Regular Expression Denial of Service (ReDoS) payload, or exhaust server memory/DB resources by requesting a massive amount of records via `?limit=999999`.
 **Prevention:** Always sanitize/escape user inputs before creating dynamic regular expressions. Add bounds checking to pagination and limit parameters to prevent data exhaustion attacks.
+## 2026-05-24 - [Timing Attack in Admin Login]
+**Vulnerability:** Admin authentication endpoint compared hardcoded string credentials using standard `===` equality, exposing it to timing attacks and potential object injection crashes (`typeof username !== 'string'`).
+**Learning:** Basic string comparison operators (`===`) leak information about the length and matching characters of strings through execution time differences. Node.js backend controllers receiving unstructured JSON input are vulnerable to object-injection crashes if expected strings are not validated prior to processing (e.g., `Buffer.from(req.body.username)` throws an error if `username` is an object).
+**Prevention:** Always validate input types (e.g., `typeof val === 'string'`) before processing them. Use `crypto.timingSafeEqual` with identical length buffers to perform constant-time comparison for sensitive comparisons like passwords, tokens, and API keys.
