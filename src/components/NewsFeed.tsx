@@ -73,8 +73,16 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
       {/* Featured Headline Section */}
       {featured && (
         <section 
+          role="button"
+          tabIndex={0}
           onClick={() => onArticleClick(featured)}
-          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onArticleClick(featured);
+            }
+          }}
+          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all duration-700"
         >
           <div className="lg:col-span-7 relative h-[60vh] lg:h-auto overflow-hidden">
             <img 
@@ -126,11 +134,19 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
         {list.map((article, idx) => (
           <motion.article
             key={article.id}
+            role="button"
+            tabIndex={0}
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             onClick={() => onArticleClick(article)}
-            className="group cursor-pointer flex flex-col h-full"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onArticleClick(article);
+              }
+            }}
+            className="group cursor-pointer flex flex-col h-full rounded-[2.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-dark-surface"
           >
             <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden mb-8 border border-white/10 shadow-black shadow-xl">
               <img 
