@@ -219,6 +219,8 @@ export default function App() {
                    favorites={favorites}
                    onFavoriteToggle={toggleFavorite}
                    systemHealth={systemHealth}
+                   emptyMessageTitle={searchQuery ? "No Intel Found" : view === "saved" ? "No Archived Intelligence" : undefined}
+                   emptyMessageDesc={searchQuery ? "No matching nodes for your query." : view === "saved" ? "You haven't secured any intel nodes yet." : undefined}
                  />
                )}
              </motion.div>
