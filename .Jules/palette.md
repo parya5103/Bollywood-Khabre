@@ -6,3 +6,7 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+
+## 2026-05-23 - Interactive Block Elements Require Keyboard Support
+**Learning:** Found that non-interactive block elements (like `<section>` or `<article>`) being used as clickable cards using just `onClick` handlers are completely inaccessible to keyboard users (they cannot be tabbed to or activated with Enter/Space).
+**Action:** Whenever converting a non-interactive element into a clickable target using `onClick`, explicitly add `role="button"`, `tabIndex={0}`, an `onKeyDown` handler mapped to Enter/Space, and visible focus states (`focus-visible`).
