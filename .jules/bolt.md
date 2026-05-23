@@ -8,3 +8,6 @@
 ## 2026-05-21 - [Mongoose Hydration Overhead]
 **Learning:** Returning full Mongoose documents for read-only Express API endpoints introduces significant CPU and memory overhead for instantiation, especially for large document sets or heavily loaded queries. Using `.lean()` bypasses document instantiation.
 **Action:** Append `.lean()` to Mongoose queries (like `find` or `findOne`) where the resulting objects are only read and directly serialized to JSON responses.
+## 2024-05-23 - [Debounce Search API Calls]
+**Learning:** Frequent state updates driving React useEffect hooks that trigger asynchronous API fetches can easily cause network spam and rate limiting (e.g., search-as-you-type inputs).
+**Action:** Always wrap user text input driving API queries in a debounced state (using setTimeout or Lodash) to limit execution frequency to ~300-500ms.
