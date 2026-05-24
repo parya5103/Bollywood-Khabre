@@ -73,8 +73,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
       {/* Featured Headline Section */}
       {featured && (
         <section 
-          onClick={() => onArticleClick(featured)}
-          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700"
+          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700 relative"
         >
           <div className="lg:col-span-7 relative h-[60vh] lg:h-auto overflow-hidden">
             <img 
@@ -87,20 +86,26 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
             <div className="absolute inset-0 bg-gradient-to-t from-dark-surface via-transparent to-transparent lg:hidden" />
           </div>
           
-          <div className="lg:col-span-5 bg-dark-elevated p-10 md:p-16 flex flex-col justify-center relative">
-            <div className="mb-10">
-              <span className="inline-block px-4 py-1.5 bg-accent text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 italic-human">
+          <div className="lg:col-span-5 bg-dark-elevated p-10 md:p-16 flex flex-col justify-center">
+            <div className="mb-10 pointer-events-none">
+              <span className="inline-block px-4 py-1.5 bg-accent text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 italic-human relative z-10 pointer-events-auto">
                 Primary Intelligence
               </span>
-              <h2 className="text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase mb-8 group-hover:italic transition-all">
-                {featured.title}
-              </h2>
-              <p className="text-slate-400 text-lg leading-relaxed font-medium line-clamp-4">
+              <button
+                aria-label={`Read featured article: ${featured.title}`}
+                onClick={() => onArticleClick(featured)}
+                className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg before:absolute before:inset-0 before:z-10 mb-8 pointer-events-auto"
+              >
+                <h2 className="text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase group-hover:italic transition-all relative z-20">
+                  {featured.title}
+                </h2>
+              </button>
+              <p className="text-slate-400 text-lg leading-relaxed font-medium line-clamp-4 relative z-20 pointer-events-none">
                 {featured.description}
               </p>
             </div>
             
-            <div className="flex items-center justify-between pt-10 border-t border-white/5">
+            <div className="flex items-center justify-between pt-10 border-t border-white/5 relative z-20 pointer-events-none">
               <div className="flex items-center gap-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                 <span className="text-cyber-purple">{featured.author}</span>
                 <span>•</span>
@@ -110,7 +115,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(featured.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(featured.id, e)}
                 className={cn(
-                  "p-4 rounded-2xl border border-white/10 transition-all",
+                  "p-4 rounded-2xl border border-white/10 transition-all focus-visible:ring-2 focus-visible:ring-accent outline-none relative z-30 pointer-events-auto",
                   favorites.includes(featured.id) ? "bg-accent border-accent text-white" : "text-white/40 hover:text-white"
                 )}
               >
@@ -129,8 +134,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            onClick={() => onArticleClick(article)}
-            className="group cursor-pointer flex flex-col h-full"
+            className="group flex flex-col h-full rounded-[2.5rem] relative"
           >
             <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden mb-8 border border-white/10 shadow-black shadow-xl">
               <img 
@@ -155,7 +159,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(article.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(article.id, e)}
                 className={cn(
-                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all",
+                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all focus-visible:ring-2 focus-visible:ring-accent outline-none z-30 pointer-events-auto",
                   favorites.includes(article.id) ? "bg-accent border-accent text-white" : "bg-black/20 text-white hover:bg-black/40"
                 )}
               >
@@ -164,18 +168,24 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
             </div>
 
             <div className="flex flex-col flex-1 px-2">
-              <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-3">
+              <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-3 pointer-events-none relative z-20">
                 <span className="w-1 h-3 bg-cyber-purple" />
-                {article.author} • {formatDate(article.publishedAt)}
+                <span>{article.author} • {formatDate(article.publishedAt)}</span>
               </div>
-              <h3 className="text-3xl font-black text-white leading-[1] tracking-tighter mb-4 group-hover:text-accent transition-colors">
-                {article.title}
-              </h3>
-              <p className="text-slate-400 text-sm leading-relaxed line-clamp-3 mb-8 opacity-70">
+              <button
+                aria-label={`Read article: ${article.title}`}
+                onClick={() => onArticleClick(article)}
+                className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg before:absolute before:inset-0 before:z-10 mb-4 pointer-events-auto"
+              >
+                <h3 className="text-3xl font-black text-white leading-[1] tracking-tighter group-hover:text-accent transition-colors relative z-20">
+                  {article.title}
+                </h3>
+              </button>
+              <p className="text-slate-400 text-sm leading-relaxed line-clamp-3 mb-8 opacity-70 pointer-events-none relative z-20">
                 {article.description}
               </p>
               
-              <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
+              <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5 pointer-events-none relative z-20">
                 <div className="flex gap-2">
                   {article.tags.slice(0, 2).map(tag => (
                     <span key={tag} className="text-[9px] font-black uppercase text-slate-600">#{tag}</span>
