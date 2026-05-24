@@ -8,3 +8,6 @@
 ## 2026-05-21 - [Mongoose Hydration Overhead]
 **Learning:** Returning full Mongoose documents for read-only Express API endpoints introduces significant CPU and memory overhead for instantiation, especially for large document sets or heavily loaded queries. Using `.lean()` bypasses document instantiation.
 **Action:** Append `.lean()` to Mongoose queries (like `find` or `findOne`) where the resulting objects are only read and directly serialized to JSON responses.
+## 2024-05-24 - API Calls Triggered on Every Keystroke
+**Learning:** Found a performance bottleneck where `fetchNews` was triggered on every single keystroke in the main search input due to immediate state dependency, causing excessive and unnecessary API requests.
+**Action:** Always implement debouncing (e.g., using a delayed state update via `setTimeout`) for search inputs that directly trigger API calls to significantly reduce network load and unnecessary React re-renders.
