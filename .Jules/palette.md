@@ -6,3 +6,6 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+## 2024-05-24 - Interactive Component Focus States
+**Learning:** Main navigation elements and toggle buttons lacked explicit keyboard focus indicators, making the site difficult to navigate for keyboard-only users.
+**Action:** Always add `focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none` to interactive components (buttons, links) to ensure accessibility guidelines are met out-of-the-box in this design system.
