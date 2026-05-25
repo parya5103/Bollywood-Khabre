@@ -8,3 +8,7 @@
 ## 2026-05-21 - [Mongoose Hydration Overhead]
 **Learning:** Returning full Mongoose documents for read-only Express API endpoints introduces significant CPU and memory overhead for instantiation, especially for large document sets or heavily loaded queries. Using `.lean()` bypasses document instantiation.
 **Action:** Append `.lean()` to Mongoose queries (like `find` or `findOne`) where the resulting objects are only read and directly serialized to JSON responses.
+
+## 2026-05-25 - [Frontend Next.js External Images]
+**Learning:** In the Next.js frontend, dynamically rendering external images from unknown scraped sources without setting `loading="lazy"` creates a massive initial network bottleneck. Using Next.js `<Image>` isn't viable because it requires configuring remote patterns in `next.config.ts`, which violates instructions against modifying config files.
+**Action:** Use native HTML `<img>` tags with `loading="lazy"` explicitly set (conditionally for below the fold) when rendering dynamically sourced external images.

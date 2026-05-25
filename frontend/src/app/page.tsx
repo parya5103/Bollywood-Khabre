@@ -32,11 +32,12 @@ export default async function Home() {
                         No articles found. Make sure the backend is running and the scrapers have successfully run.
                     </div>
                 )}
-                {news.map((article: { slug: string; imageUrl?: string; title: string; category: string; description: string; viralScore: number }) => (
+                {news.map((article: { slug: string; imageUrl?: string; title: string; category: string; description: string; viralScore: number }, index: number) => (
                     <div key={article.slug} className="bg-slate-900 rounded-3xl overflow-hidden border border-white/5 hover:border-orange-500/50 transition-colors flex flex-col">
                         {article.imageUrl && (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={article.imageUrl} alt={article.title} className="w-full h-48 object-cover" />
+                            /* ⚡ Bolt: Native lazy loading for images below the fold to reduce initial load bandwidth */
+                            <img src={article.imageUrl} alt={article.title} className="w-full h-48 object-cover" loading={index > 2 ? "lazy" : "eager"} />
                         )}
                         <div className="p-6 flex flex-col flex-1">
                             <div className="text-xs font-bold text-orange-500 mb-3 uppercase tracking-wider">{article.category}</div>
