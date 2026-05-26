@@ -6,3 +6,7 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+
+## 2026-05-26 - Accessible Interactive Cards with Semantic Buttons
+**Learning:** When making UI cards interactive that contain nested interactive elements (e.g., Save buttons), applying `onClick` and `role="button"` to the parent container creates ARIA violations and complex event bubbling issues. Screen readers struggle with nested interactive elements, and users may accidentally trigger the wrong action.
+**Action:** Set the parent container to `relative`, wrap the card title in a semantic `<button>` for the primary `onClick`, and use a `before:absolute before:inset-0` pseudo-element to stretch the clickable area. Ensure nested interactive elements have `relative z-10 pointer-events-auto` to remain accessible above the stretched pseudo-element.
