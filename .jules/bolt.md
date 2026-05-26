@@ -8,3 +8,6 @@
 ## 2026-05-21 - [Mongoose Hydration Overhead]
 **Learning:** Returning full Mongoose documents for read-only Express API endpoints introduces significant CPU and memory overhead for instantiation, especially for large document sets or heavily loaded queries. Using `.lean()` bypasses document instantiation.
 **Action:** Append `.lean()` to Mongoose queries (like `find` or `findOne`) where the resulting objects are only read and directly serialized to JSON responses.
+## 2026-05-26 - [Redundant Database Query Execution]
+**Learning:** In `backend/src/routes/newsRoutes.js`, if the `category` is "trending", the API first performs a full database query (`Article.find(query)...`) and immediately overwrites its result with a second query (`Article.find().sort({ viralScore: -1 })...`). This results in unnecessary database operations, latency, and resource consumption.
+**Action:** Use an `if/else` branching logic to ensure only one database query is executed based on the required conditions, preventing redundant queries.
