@@ -6,3 +6,7 @@
 ## 2024-05-21 - Newsletter Form Accessibility and Feedback
 **Learning:** Email inputs relying purely on placeholder text need explicit `aria-label` attributes to be fully understandable by screen readers. Furthermore, adding visual elements like spinners along with `aria-live` regions for async states drastically improves UX feedback for both sighted and screen-reader users.
 **Action:** When creating or auditing form components, proactively add `aria-label` if `<label>` isn't present, and combine visual loading states with screen reader announcements (`aria-busy`/`aria-live`).
+
+## 2026-05-18 - The "Stretched Link" Component Pattern
+**Learning:** Utilizing absolutely positioned `::before` pseudo-elements (`before:absolute before:inset-0`) on native `<button>` tags offers an elegant, highly accessible way to create interactive UI cards (such as those in `NewsFeed`) without applying global `onClick` handlers to non-semantic wrapper tags (like `div` or `section`). This approach automatically provides keyboard accessibility and clear screen-reader context without custom event propagation.
+**Action:** When designing cards with entire clickable areas, wrap the title text in a `<button>` tag instead of adding `onClick` to the container. Apply `relative` to the wrapper, use `before:inset-0` on the button, and ensure inner actionable components (like "Favorite" or "Save" buttons) are kept above the pseudo-element overlay using `absolute z-10` or `relative z-10 pointer-events-auto`.
