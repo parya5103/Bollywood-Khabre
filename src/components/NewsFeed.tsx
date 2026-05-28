@@ -73,8 +73,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
       {/* Featured Headline Section */}
       {featured && (
         <section 
-          onClick={() => onArticleClick(featured)}
-          className="group grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 cursor-pointer shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700"
+          className="group relative grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-[3rem] border border-white/10 shadow-black shadow-2xl hover:border-orange-500/30 transition-all duration-700"
         >
           <div className="lg:col-span-7 relative h-[60vh] lg:h-auto overflow-hidden">
             <img 
@@ -83,24 +82,29 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
               className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[2s]"
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-dark-surface/80 via-transparent to-transparent hidden lg:block" />
-            <div className="absolute inset-0 bg-gradient-to-t from-dark-surface via-transparent to-transparent lg:hidden" />
+            <div className="absolute inset-0 bg-gradient-to-r from-dark-surface/80 via-transparent to-transparent hidden lg:block pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-dark-surface via-transparent to-transparent lg:hidden pointer-events-none" />
           </div>
           
-          <div className="lg:col-span-5 bg-dark-elevated p-10 md:p-16 flex flex-col justify-center relative">
+          <div className="lg:col-span-5 bg-dark-elevated p-10 md:p-16 flex flex-col justify-center">
             <div className="mb-10">
-              <span className="inline-block px-4 py-1.5 bg-accent text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 italic-human">
+              <span className="inline-block px-4 py-1.5 bg-accent text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 italic-human relative z-10 pointer-events-none">
                 Primary Intelligence
               </span>
               <h2 className="text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase mb-8 group-hover:italic transition-all">
-                {featured.title}
+                <button
+                  onClick={() => onArticleClick(featured)}
+                  className="before:absolute before:inset-0 text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
+                >
+                  {featured.title}
+                </button>
               </h2>
-              <p className="text-slate-400 text-lg leading-relaxed font-medium line-clamp-4">
+              <p className="text-slate-400 text-lg leading-relaxed font-medium line-clamp-4 relative z-10 pointer-events-none">
                 {featured.description}
               </p>
             </div>
             
-            <div className="flex items-center justify-between pt-10 border-t border-white/5">
+            <div className="flex items-center justify-between pt-10 border-t border-white/5 relative z-10 pointer-events-none">
               <div className="flex items-center gap-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                 <span className="text-cyber-purple">{featured.author}</span>
                 <span>•</span>
@@ -110,8 +114,8 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(featured.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(featured.id, e)}
                 className={cn(
-                  "p-4 rounded-2xl border border-white/10 transition-all",
-                  favorites.includes(featured.id) ? "bg-accent border-accent text-white" : "text-white/40 hover:text-white"
+                  "p-4 rounded-2xl border border-white/10 transition-all pointer-events-auto",
+                  favorites.includes(featured.id) ? "bg-accent border-accent text-white" : "text-white/40 hover:text-white focus-visible:ring-2 focus-visible:ring-accent"
                 )}
               >
                 <Bookmark size={20} fill={favorites.includes(featured.id) ? "currentColor" : "none"} />
@@ -129,8 +133,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            onClick={() => onArticleClick(article)}
-            className="group cursor-pointer flex flex-col h-full"
+            className="group relative flex flex-col h-full"
           >
             <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden mb-8 border border-white/10 shadow-black shadow-xl">
               <img 
@@ -139,7 +142,7 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+              <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
                 <div className="flex gap-2 mb-4">
                   <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[9px] font-black uppercase text-white/80 border border-white/20">
                     {article.category}
@@ -155,21 +158,26 @@ export default function NewsFeed({ news, loading, onArticleClick, favorites, onF
                 aria-label={favorites.includes(article.id) ? "Remove from saved" : "Save article"}
                 onClick={(e) => onFavoriteToggle(article.id, e)}
                 className={cn(
-                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all",
-                  favorites.includes(article.id) ? "bg-accent border-accent text-white" : "bg-black/20 text-white hover:bg-black/40"
+                  "absolute top-6 right-6 p-4 rounded-2xl backdrop-blur-xl border border-white/20 transition-all z-10 pointer-events-auto",
+                  favorites.includes(article.id) ? "bg-accent border-accent text-white" : "bg-black/20 text-white hover:bg-black/40 focus-visible:ring-2 focus-visible:ring-accent"
                 )}
               >
                 <Bookmark size={18} fill={favorites.includes(article.id) ? "currentColor" : "none"} />
               </button>
             </div>
 
-            <div className="flex flex-col flex-1 px-2">
+            <div className="flex flex-col flex-1 px-2 pointer-events-none">
               <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-3">
                 <span className="w-1 h-3 bg-cyber-purple" />
                 {article.author} • {formatDate(article.publishedAt)}
               </div>
-              <h3 className="text-3xl font-black text-white leading-[1] tracking-tighter mb-4 group-hover:text-accent transition-colors">
-                {article.title}
+              <h3 className="text-3xl font-black text-white leading-[1] tracking-tighter mb-4 group-hover:text-accent transition-colors pointer-events-auto">
+                <button
+                  onClick={() => onArticleClick(article)}
+                  className="before:absolute before:inset-0 text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
+                >
+                  {article.title}
+                </button>
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed line-clamp-3 mb-8 opacity-70">
                 {article.description}
