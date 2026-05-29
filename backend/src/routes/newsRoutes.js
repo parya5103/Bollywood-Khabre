@@ -31,12 +31,14 @@ router.get('/', async (req, res) => {
             ];
         }
 
-        // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
-        let articles = await Article.find(query).sort({ publishedAt: -1 }).limit(limit).lean();
-
+        let articles;
+        // ⚡ Bolt: Use if-else to prevent executing a redundant database query that immediately gets overwritten
         if (category === 'trending') {
-             // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
-             articles = await Article.find().sort({ viralScore: -1 }).limit(limit).lean();
+            // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
+            articles = await Article.find().sort({ viralScore: -1 }).limit(limit).lean();
+        } else {
+            // ⚡ Bolt: Added .lean() to bypass document instantiation for read-only query
+            articles = await Article.find(query).sort({ publishedAt: -1 }).limit(limit).lean();
         }
 
         res.json(articles);
